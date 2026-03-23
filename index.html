@@ -780,55 +780,55 @@ const SERIES = {
 
 const BOOKS = [
   // ── Isadora Moon (22 books) ──
-  // coverId = Open Library cover ID → https://covers.openlibrary.org/b/id/{coverId}-M.jpg
-  { name: 'Isadora Moon Goes to School', series: 'isadora', year: 2016, emoji: '🏫', coverId: 8572936 },
-  { name: 'Isadora Moon Goes Camping', series: 'isadora', year: 2016, emoji: '⛺', coverId: 8541803 },
-  { name: 'Isadora Moon Has a Birthday', series: 'isadora', year: 2016, emoji: '🎂', coverId: 8501869 },
-  { name: 'Isadora Moon Goes to the Ballet', series: 'isadora', year: 2016, emoji: '🩰', coverId: 13894388 },
-  { name: 'Isadora Moon Gets in Trouble', series: 'isadora', year: 2017, emoji: '😬', coverId: 8572280 },
-  { name: 'Isadora Moon Goes on a School Trip', series: 'isadora', year: 2017, emoji: '🚌', coverId: 10641392 },
-  { name: 'Isadora Moon Goes to the Fair', series: 'isadora', year: 2018, emoji: '🎡', coverId: 10898276 },
-  { name: 'Isadora Moon Makes Winter Magic', series: 'isadora', year: 2018, emoji: '❄️', coverId: 8452261 },
-  { name: 'Isadora Moon Has a Sleepover', series: 'isadora', year: 2019, emoji: '🛏️', coverId: 10132091 },
-  { name: 'Isadora Moon Puts on a Show', series: 'isadora', year: 2019, emoji: '🎭', coverId: 10641381 },
-  { name: 'Isadora Moon Goes on Holiday', series: 'isadora', year: 2020, emoji: '✈️', coverId: 10641397 },
-  { name: 'Isadora Moon Goes to a Wedding', series: 'isadora', year: 2021, emoji: '💒', coverId: 10641422 },
-  { name: 'Isadora Moon Meets the Tooth Fairy', series: 'isadora', year: 2021, emoji: '🦷' },
-  { name: 'Isadora Moon and the Shooting Star', series: 'isadora', year: 2021, emoji: '🌠' },
-  { name: 'Isadora Moon Gets the Magic Pox', series: 'isadora', year: 2022, emoji: '✨' },
-  { name: 'Isadora Moon Under the Sea', series: 'isadora', year: 2022, emoji: '🐚' },
-  { name: 'Isadora Moon and the New Girl', series: 'isadora', year: 2023, emoji: '👧' },
-  { name: 'Isadora Moon and the Frost Festival', series: 'isadora', year: 2023, emoji: '🧊' },
-  { name: 'Isadora Moon Helps Out', series: 'isadora', year: 2024, emoji: '🤝' },
-  { name: 'Isadora Moon Makes a Wish', series: 'isadora', year: 2024, emoji: '🌟' },
-  { name: 'Isadora Moon Rides a Bike', series: 'isadora', year: 2025, emoji: '🚲' },
-  { name: 'Isadora Moon and the Pop Stars', series: 'isadora', year: 2025, emoji: '🎤' },
+  // coverId = Open Library cover ID, isbn = OUP paperback ISBN for cover fallback
+  { name: 'Isadora Moon Goes to School', series: 'isadora', year: 2016, emoji: '🏫', coverId: 8572936, isbn: '9780192744319' },
+  { name: 'Isadora Moon Goes Camping', series: 'isadora', year: 2016, emoji: '⛺', coverId: 8541803, isbn: '9780192744333' },
+  { name: 'Isadora Moon Has a Birthday', series: 'isadora', year: 2016, emoji: '🎂', coverId: 8501869, isbn: '9780192744357' },
+  { name: 'Isadora Moon Goes to the Ballet', series: 'isadora', year: 2016, emoji: '🩰', coverId: 13894388, isbn: '9780192744371' },
+  { name: 'Isadora Moon Gets in Trouble', series: 'isadora', year: 2017, emoji: '😬', coverId: 8572280, isbn: '9780192758514' },
+  { name: 'Isadora Moon Goes on a School Trip', series: 'isadora', year: 2017, emoji: '🚌', coverId: 10641392, isbn: '9780192758538' },
+  { name: 'Isadora Moon Goes to the Fair', series: 'isadora', year: 2018, emoji: '🎡', coverId: 10898276, isbn: '9780192767103' },
+  { name: 'Isadora Moon Makes Winter Magic', series: 'isadora', year: 2018, emoji: '❄️', coverId: 8452261, isbn: '9780192772572' },
+  { name: 'Isadora Moon Has a Sleepover', series: 'isadora', year: 2019, emoji: '🛏️', coverId: 10132091, isbn: '9780192767110' },
+  { name: 'Isadora Moon Puts on a Show', series: 'isadora', year: 2019, emoji: '🎭', coverId: 10641381, isbn: '9780192777188' },
+  { name: 'Isadora Moon Goes on Holiday', series: 'isadora', year: 2020, emoji: '✈️', coverId: 10641397, isbn: '9780192771643' },
+  { name: 'Isadora Moon Goes to a Wedding', series: 'isadora', year: 2021, emoji: '💒', coverId: 10641422, isbn: '9780192779533' },
+  { name: 'Isadora Moon Meets the Tooth Fairy', series: 'isadora', year: 2021, emoji: '🦷', isbn: '9780192773548' },
+  { name: 'Isadora Moon and the Shooting Star', series: 'isadora', year: 2021, emoji: '🌠', isbn: '9780192783455' },
+  { name: 'Isadora Moon Gets the Magic Pox', series: 'isadora', year: 2022, emoji: '✨', isbn: '9780192773562' },
+  { name: 'Isadora Moon Under the Sea', series: 'isadora', year: 2022, emoji: '🐚', isbn: '9780192788788' },
+  { name: 'Isadora Moon and the New Girl', series: 'isadora', year: 2023, emoji: '👧', isbn: '9780192778086' },
+  { name: 'Isadora Moon and the Frost Festival', series: 'isadora', year: 2023, emoji: '🧊', isbn: '9780192788764' },
+  { name: 'Isadora Moon Helps Out', series: 'isadora', year: 2024, emoji: '🤝', isbn: '9780192778109' },
+  { name: 'Isadora Moon Makes a Wish', series: 'isadora', year: 2024, emoji: '🌟', isbn: '9780192788771' },
+  { name: 'Isadora Moon Rides a Bike', series: 'isadora', year: 2025, emoji: '🚲', isbn: '9780192787842' },
+  { name: 'Isadora Moon and the Pop Stars', series: 'isadora', year: 2025, emoji: '🎤', isbn: '9780192787866' },
 
   // ── Mirabelle (15 books) ──
-  { name: 'Mirabelle Gets up to Mischief', series: 'mirabelle', year: 2020, emoji: '😈', coverId: 11000766 },
-  { name: 'Mirabelle Breaks the Rules', series: 'mirabelle', year: 2021, emoji: '📜' },
-  { name: 'Mirabelle Has a Bad Day', series: 'mirabelle', year: 2021, emoji: '😤', coverId: 11984988 },
-  { name: 'Mirabelle In Double Trouble', series: 'mirabelle', year: 2022, emoji: '👯' },
-  { name: 'Mirabelle and the Naughty Bat Kittens', series: 'mirabelle', year: 2022, emoji: '🦇' },
-  { name: 'Mirabelle and the Magical Mayhem', series: 'mirabelle', year: 2022, emoji: '💫' },
-  { name: 'Mirabelle Takes Charge', series: 'mirabelle', year: 2023, emoji: '👑' },
-  { name: 'Mirabelle Wants to Win', series: 'mirabelle', year: 2023, emoji: '🏆' },
-  { name: 'Mirabelle and the Haunted House', series: 'mirabelle', year: 2023, emoji: '👻' },
-  { name: 'Mirabelle and the Midnight Feast', series: 'mirabelle', year: 2024, emoji: '🌙' },
-  { name: 'Mirabelle and the Picnic Pranks', series: 'mirabelle', year: 2024, emoji: '🧺' },
-  { name: 'Mirabelle and the Baby Dragons', series: 'mirabelle', year: 2024, emoji: '🐉' },
-  { name: 'Mirabelle in Witch City', series: 'mirabelle', year: 2025, emoji: '🏙️' },
-  { name: 'Mirabelle and the Party Tricks', series: 'mirabelle', year: 2025, emoji: '🎩' },
-  { name: 'Mirabelle and the Enchanted Sea Globe', series: 'mirabelle', year: 2026, emoji: '🔮', isNew: true },
+  { name: 'Mirabelle Gets up to Mischief', series: 'mirabelle', year: 2020, emoji: '😈', coverId: 11000766, isbn: '9780192776495' },
+  { name: 'Mirabelle Breaks the Rules', series: 'mirabelle', year: 2021, emoji: '📜', isbn: '9780192777546' },
+  { name: 'Mirabelle Has a Bad Day', series: 'mirabelle', year: 2021, emoji: '😤', coverId: 11984988, isbn: '9780192777553' },
+  { name: 'Mirabelle In Double Trouble', series: 'mirabelle', year: 2022, emoji: '👯', isbn: '9780192777560' },
+  { name: 'Mirabelle and the Naughty Bat Kittens', series: 'mirabelle', year: 2022, emoji: '🦇', isbn: '9780192777577' },
+  { name: 'Mirabelle and the Magical Mayhem', series: 'mirabelle', year: 2022, emoji: '💫', isbn: '9780192777584' },
+  { name: 'Mirabelle Takes Charge', series: 'mirabelle', year: 2023, emoji: '👑', isbn: '9780192783721' },
+  { name: 'Mirabelle Wants to Win', series: 'mirabelle', year: 2023, emoji: '🏆', isbn: '9780192783745' },
+  { name: 'Mirabelle and the Haunted House', series: 'mirabelle', year: 2023, emoji: '👻', isbn: '9780192788726' },
+  { name: 'Mirabelle and the Midnight Feast', series: 'mirabelle', year: 2024, emoji: '🌙', isbn: '9780192783783' },
+  { name: 'Mirabelle and the Picnic Pranks', series: 'mirabelle', year: 2024, emoji: '🧺', isbn: '9780192787965' },
+  { name: 'Mirabelle and the Baby Dragons', series: 'mirabelle', year: 2024, emoji: '🐉', isbn: '9780192787996' },
+  { name: 'Mirabelle in Witch City', series: 'mirabelle', year: 2025, emoji: '🏙️', isbn: '9780192788016' },
+  { name: 'Mirabelle and the Party Tricks', series: 'mirabelle', year: 2025, emoji: '🎩', isbn: '9780192788030' },
+  { name: 'Mirabelle and the Enchanted Sea Globe', series: 'mirabelle', year: 2026, emoji: '🔮', isNew: true, isbn: '9780192788061' },
 
   // ── Emerald (8 books) ──
-  { name: 'Emerald and the Ocean Parade', series: 'emerald', year: 2023, emoji: '🎊' },
-  { name: 'Emerald and the Sea Sprites', series: 'emerald', year: 2023, emoji: '🧚' },
-  { name: 'Emerald and the Lost Treasure', series: 'emerald', year: 2024, emoji: '💎' },
-  { name: 'Emerald and the Runaway Royal', series: 'emerald', year: 2024, emoji: '👸' },
-  { name: 'Emerald and the Magic Shell', series: 'emerald', year: 2025, emoji: '🐚' },
-  { name: 'Emerald and the New Arrival', series: 'emerald', year: 2025, emoji: '🐣' },
-  { name: 'Emerald and the Sea Dragon', series: 'emerald', year: 2026, emoji: '🐲', isNew: true },
+  { name: 'Emerald and the Ocean Parade', series: 'emerald', year: 2023, emoji: '🎊', isbn: '9780192788733' },
+  { name: 'Emerald and the Sea Sprites', series: 'emerald', year: 2023, emoji: '🧚', isbn: '9780192783998' },
+  { name: 'Emerald and the Lost Treasure', series: 'emerald', year: 2024, emoji: '💎', isbn: '9780192784018' },
+  { name: 'Emerald and the Runaway Royal', series: 'emerald', year: 2024, emoji: '👸', isbn: '9780192784032' },
+  { name: 'Emerald and the Magic Shell', series: 'emerald', year: 2025, emoji: '🐚', isbn: '9780192784056' },
+  { name: 'Emerald and the New Arrival', series: 'emerald', year: 2025, emoji: '🐣', isbn: '9780192784070' },
+  { name: 'Emerald and the Sea Dragon', series: 'emerald', year: 2026, emoji: '🐲', isNew: true, isbn: '9781382073004' },
   { name: 'Emerald and the Pearly Turtles', series: 'emerald', year: 2026, emoji: '🐢', isNew: true }
 ];
 
@@ -976,9 +976,13 @@ function renderBookCard(book) {
   else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
   else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
 
-  // Cover image or emoji fallback
-  const coverHtml = book.coverId
-    ? `<div class="book-cover-wrap"><img class="book-cover" src="https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg" alt="${book.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'"></div>`
+  // Cover image: try coverId first, then ISBN, then emoji fallback
+  let coverUrl = null;
+  if (book.coverId) coverUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`;
+  else if (book.isbn) coverUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`;
+
+  const coverHtml = coverUrl
+    ? `<div class="book-cover-wrap"><img class="book-cover" src="${coverUrl}" alt="${book.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'"></div>`
     : `<span class="book-emoji">${book.emoji}</span>`;
 
   return `
