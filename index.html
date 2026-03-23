@@ -976,9 +976,10 @@ function renderBookCard(book) {
   else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
   else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
 
-  // Cover image: try coverId first, then ISBN, then emoji fallback
+  // Cover image: try coverId first, then Google Books, then ISBN, then emoji fallback
   let coverUrl = null;
   if (book.coverId) coverUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`;
+  else if (book.googleCover) coverUrl = book.googleCover;
   else if (book.isbn) coverUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`;
 
   const coverHtml = coverUrl
@@ -1306,9 +1307,60 @@ function refreshCurrentScreen() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   GOOGLE BOOKS COVER FETCHER (fills missing covers at runtime)
+   ═══════════════════════════════════════════════════════════ */
+async function fetchMissingCovers() {
+  const CACHE_KEY = 'hm_gcovers_v2';
+  let cache = {};
+  try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch {}
+
+  const missing = BOOKS.filter(b => !b.coverId && !(b.name in cache));
+  if (missing.length === 0) {
+    BOOKS.forEach(b => { if (!b.coverId && cache[b.name]) b.googleCover = cache[b.name]; });
+    refreshCurrentScreen();
+    return;
+  }
+
+  let found = 0;
+  for (let i = 0; i < missing.length; i++) {
+    const book = missing[i];
+    let thumb = null;
+    try {
+      // Try ISBN first
+      if (book.isbn) {
+        const r1 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${book.isbn}&fields=items(volumeInfo/imageLinks)`);
+        const d1 = await r1.json();
+        thumb = d1.items?.[0]?.volumeInfo?.imageLinks?.thumbnail;
+      }
+      // Fallback: title search
+      if (!thumb) {
+        const q = encodeURIComponent(book.name + ' harriet muncaster');
+        const r2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&fields=items(volumeInfo/imageLinks)&maxResults=1`);
+        const d2 = await r2.json();
+        thumb = d2.items?.[0]?.volumeInfo?.imageLinks?.thumbnail;
+      }
+      if (thumb) {
+        const url = thumb.replace('http://', 'https://').replace('zoom=1', 'zoom=2');
+        cache[book.name] = url;
+        book.googleCover = url;
+        found++;
+      } else {
+        cache[book.name] = '';
+      }
+    } catch { cache[book.name] = ''; }
+    await new Promise(r => setTimeout(r, 350));
+  }
+
+  localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  BOOKS.forEach(b => { if (!b.coverId && cache[b.name]) b.googleCover = cache[b.name]; });
+  if (found > 0) refreshCurrentScreen();
+}
+
+/* ═══════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════ */
 renderHome();
+fetchMissingCovers();
 </script>
 </body>
 </html>
