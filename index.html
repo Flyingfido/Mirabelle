@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My Books">
+<meta name="theme-color" content="#9B8FE8">
+<title>Harriet Muncaster Book Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   CSS VARIABLES & RESET
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --bg: #F5F0FF;
+  --primary: #9B8FE8;
+  --primary-dark: #7B6FD8;
+  --primary-light: #C5BFFA;
+  --isadora: #C77DFF;
+  --isadora-light: #E8C5FF;
+  --mirabelle: #7C6FE0;
+  --mirabelle-light: #B5ADFF;
+  --emerald: #38BDF8;
+  --emerald-light: #A5DFFF;
+  --owned: #6BCB77;
+  --owned-light: #D4F5D8;
+  --wish: #FFD93D;
+  --wish-light: #FFF3C0;
+  --new-badge: #FF6B9D;
+  --text: #2D2046;
+  --text-light: #6B5F80;
+  --card-bg: #FFFFFF;
+  --card-shadow: rgba(155, 143, 232, 0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Subtle star pattern background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, var(--primary-light) 1px, transparent 1px),
+    radial-gradient(circle, var(--primary-light) 0.5px, transparent 0.5px);
+  background-size: 40px 40px, 25px 25px;
+  background-position: 0 0, 12px 12px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREENS
+   ═══════════════════════════════════════════════════════════ */
+.screen { display: none; position: relative; z-index: 1; }
+.screen.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════ */
+.header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--mirabelle) 50%, var(--isadora) 100%);
+  color: white;
+  padding: 28px 20px 32px;
+  text-align: center;
+  clip-path: ellipse(120% 100% at 50% 0%);
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: '✨ 🧚 ✨';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  opacity: 0.6;
+}
+.header h1 {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: clamp(24px, 5vw, 36px);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  letter-spacing: 0.5px;
+}
+.header .subtitle {
+  font-size: clamp(13px, 3vw, 16px);
+  opacity: 0.9;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Sub-header with back button */
+.sub-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 18px 20px 24px;
+  clip-path: ellipse(120% 100% at 50% 0%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sub-header.isadora { background: linear-gradient(135deg, var(--isadora) 0%, #A855F7 100%); }
+.sub-header.mirabelle { background: linear-gradient(135deg, var(--mirabelle) 0%, #5B4FCF 100%); }
+.sub-header.emerald { background: linear-gradient(135deg, var(--emerald) 0%, #0EA5E9 100%); }
+
+.back-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { background: rgba(255,255,255,0.35); }
+
+.sub-header h2 {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: clamp(20px, 4.5vw, 28px);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.sub-header .series-count {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-left: auto;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   OVERALL STATS BAR
+   ═══════════════════════════════════════════════════════════ */
+.stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--card-bg);
+  margin: -12px 16px 12px;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--card-shadow);
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+}
+.stat {
+  text-align: center;
+  min-width: 60px;
+}
+.stat-num {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--primary);
+}
+.stat-num.owned-color { color: var(--owned); }
+.stat-num.wish-color { color: var(--wish); }
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
+}
+.progress-wrap {
+  flex: 1;
+  min-width: 100px;
+  max-width: 200px;
+}
+.progress-bar {
+  height: 10px;
+  background: #E8E3F5;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--owned), #4ECDC4);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+.progress-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOME SCREEN — CHARACTER CARDS
+   ═══════════════════════════════════════════════════════════ */
+.character-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.character-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 4px 20px var(--card-shadow);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-left: 5px solid var(--primary);
+  -webkit-tap-highlight-color: transparent;
+}
+.character-card:active { transform: scale(0.97); }
+.character-card.isadora { border-left-color: var(--isadora); }
+.character-card.mirabelle { border-left-color: var(--mirabelle); }
+.character-card.emerald { border-left-color: var(--emerald); }
+
+.character-icon {
+  font-size: 42px;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg);
+}
+.character-card.isadora .character-icon { background: var(--isadora-light); }
+.character-card.mirabelle .character-icon { background: var(--mirabelle-light); }
+.character-card.emerald .character-icon { background: var(--emerald-light); }
+
+.character-info { flex: 1; }
+.character-name {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text);
+}
+.character-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.character-progress {
+  margin-top: 8px;
+  height: 8px;
+  background: #E8E3F5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.character-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.character-card.isadora .character-progress-fill { background: var(--isadora); }
+.character-card.mirabelle .character-progress-fill { background: var(--mirabelle); }
+.character-card.emerald .character-progress-fill { background: var(--emerald); }
+
+.character-stats {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.character-arrow {
+  font-size: 20px;
+  color: var(--primary-light);
+  flex-shrink: 0;
+}
+
+/* All books button */
+.all-books-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 16px;
+  width: 100%;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(155, 143, 232, 0.3);
+  -webkit-tap-highlight-color: transparent;
+}
+.all-books-btn:active { transform: scale(0.97); }
+
+/* ═══════════════════════════════════════════════════════════
+   FILTER BAR & SEARCH
+   ═══════════════════════════════════════════════════════════ */
+.controls {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.search-wrap {
+  position: relative;
+}
+.search-wrap input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border: 2px solid #E8E3F5;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  background: var(--card-bg);
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--primary); }
+.search-wrap input::placeholder { color: #B0A5C5; }
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+
+.filter-btn {
+  background: var(--card-bg);
+  border: 2px solid #E8E3F5;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.filter-btn:active { transform: scale(0.95); }
+
+/* Sort toggle */
+.sort-btn {
+  background: var(--card-bg);
+  border: 2px solid #E8E3F5;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.sort-btn.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOOK GRID
+   ═══════════════════════════════════════════════════════════ */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  padding: 0 16px 100px;
+}
+/* Series heading in all-books view */
+.series-heading {
+  grid-column: 1 / -1;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text);
+  padding: 12px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.series-heading .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOOK CARD
+   ═══════════════════════════════════════════════════════════ */
+.book-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 14px 10px 10px;
+  box-shadow: 0 3px 12px var(--card-shadow);
+  text-align: center;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-top: 4px solid transparent;
+  overflow: hidden;
+}
+.book-card:active { transform: scale(0.96); }
+.book-card.isadora { border-top-color: var(--isadora); }
+.book-card.mirabelle { border-top-color: var(--mirabelle); }
+.book-card.emerald { border-top-color: var(--emerald); }
+
+.book-card.owned {
+  background: var(--owned-light);
+  border-top-color: var(--owned);
+}
+.book-card.wish {
+  background: var(--wish-light);
+  border-top-color: var(--wish);
+}
+
+.book-emoji {
+  font-size: 36px;
+  margin-bottom: 6px;
+  display: block;
+}
+.book-cover {
+  width: 80px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.book-cover-wrap {
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.character-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+}
+.book-title {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  margin-bottom: 8px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Owned / Wish badges */
+.badge-owned, .badge-wish {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+.badge-owned {
+  background: var(--owned);
+  color: white;
+}
+.badge-wish {
+  background: var(--wish);
+  color: #7A6400;
+}
+
+/* New / Coming Soon badge */
+.badge-new {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--new-badge);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Action buttons */
+.book-actions {
+  display: flex;
+  gap: 6px;
+}
+.btn-have, .btn-wish {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 7px 4px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-have {
+  background: #E8FBE9;
+  color: #2E7D32;
+}
+.btn-have.active {
+  background: var(--owned);
+  color: white;
+}
+.btn-wish {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+.btn-wish.active {
+  background: var(--wish);
+  color: #7A6400;
+}
+.btn-have:active, .btn-wish:active { transform: scale(0.93); }
+
+/* ═══════════════════════════════════════════════════════════
+   MAGIC WAND ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+.wand-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+.wand {
+  position: absolute;
+  font-size: 40px;
+  animation: wandWave 1.2s ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(155, 143, 232, 0.6));
+}
+@keyframes wandWave {
+  0% { transform: rotate(-30deg) scale(0); opacity: 0; }
+  20% { transform: rotate(-15deg) scale(1.2); opacity: 1; }
+  40% { transform: rotate(15deg) scale(1); opacity: 1; }
+  60% { transform: rotate(-5deg) scale(1.1); opacity: 1; }
+  80% { transform: rotate(5deg) scale(1); opacity: 0.8; }
+  100% { transform: rotate(0deg) scale(0.5); opacity: 0; }
+}
+
+.sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: sparkleFloat 1s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes sparkleFloat {
+  0% { transform: translate(0, 0) scale(0); opacity: 1; }
+  50% { opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+.card-glow {
+  animation: glowPulse 0.8s ease-out;
+}
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0 0 rgba(155, 143, 232, 0.5); }
+  50% { box-shadow: 0 0 20px 10px rgba(155, 143, 232, 0.3); }
+  100% { box-shadow: 0 3px 12px var(--card-shadow); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state .empty-text { font-size: 16px; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════ */
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 600px) {
+  .character-grid { grid-template-columns: 1fr; }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+@media (min-width: 768px) {
+  .book-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 0 24px 100px; }
+  .character-grid { padding: 20px 24px; }
+  .controls { padding: 16px 24px; }
+}
+@media (min-width: 1024px) {
+  .book-grid { grid-template-columns: repeat(7, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     WAND OVERLAY (fixed, always present)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="wand-overlay" id="wandOverlay"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 1: HOME
+     ═══════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screenHome">
+  <div class="header">
+    <h1>My Harriet Muncaster Books</h1>
+    <div class="subtitle">Tap a character to see their books!</div>
+  </div>
+
+  <div class="stats-bar" id="homeStats"></div>
+
+  <div class="character-grid" id="characterGrid"></div>
+
+  <div class="footer">Made with magic for book lovers ✨</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 2: CHARACTER PAGE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenCharacter">
+  <div class="sub-header" id="charHeader">
+    <button class="back-btn" onclick="showHome()">&#8592;</button>
+    <div>
+      <h2 id="charTitle"></h2>
+    </div>
+    <div class="series-count" id="charCount"></div>
+  </div>
+
+  <div class="stats-bar" id="charStats"></div>
+
+  <div class="controls" id="charControls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="charSearch" placeholder="Search books..." autocomplete="off">
+    </div>
+    <div class="filter-row" id="charFilters"></div>
+  </div>
+
+  <div class="book-grid" id="charGrid"></div>
+  <div class="footer">Made with magic for book lovers ✨</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 3: ALL BOOKS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenAll">
+  <div class="sub-header">
+    <button class="back-btn" onclick="showHome()">&#8592;</button>
+    <div>
+      <h2>All Books</h2>
+    </div>
+    <div class="series-count" id="allCount"></div>
+  </div>
+
+  <div class="stats-bar" id="allStats"></div>
+
+  <div class="controls" id="allControls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="allSearch" placeholder="Search all books..." autocomplete="off">
+    </div>
+    <div class="filter-row" id="allFilters"></div>
+  </div>
+
+  <div class="book-grid" id="allGrid"></div>
+  <div class="footer">Made with magic for book lovers ✨</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════════════════════ */
+const SERIES = {
+  isadora: {
+    id: 'isadora',
+    name: 'Isadora Moon',
+    icon: '🧛',
+    desc: 'Half vampire, half fairy, totally unique!',
+    color: '#C77DFF',
+    colorLight: '#E8C5FF',
+    coverImg: 'https://covers.openlibrary.org/b/id/8572936-M.jpg'
+  },
+  mirabelle: {
+    id: 'mirabelle',
+    name: 'Mirabelle',
+    icon: '🧙',
+    desc: 'Half witch, half fairy, totally naughty!',
+    color: '#7C6FE0',
+    colorLight: '#B5ADFF',
+    coverImg: 'https://covers.openlibrary.org/b/id/11000766-M.jpg'
+  },
+  emerald: {
+    id: 'emerald',
+    name: 'Emerald',
+    icon: '🧜',
+    desc: 'A mermaid princess with big adventures!',
+    color: '#38BDF8',
+    colorLight: '#A5DFFF',
+    coverImg: 'https://covers.openlibrary.org/b/id/14346816-M.jpg'
+  }
+};
+
+const BOOKS = [
+  // ── Isadora Moon (22 books) ──
+  // coverId = Open Library cover ID → https://covers.openlibrary.org/b/id/{coverId}-M.jpg
+  { name: 'Isadora Moon Goes to School', series: 'isadora', year: 2016, emoji: '🏫', coverId: 8572936 },
+  { name: 'Isadora Moon Goes Camping', series: 'isadora', year: 2016, emoji: '⛺', coverId: 8541803 },
+  { name: 'Isadora Moon Has a Birthday', series: 'isadora', year: 2016, emoji: '🎂', coverId: 8501869 },
+  { name: 'Isadora Moon Goes to the Ballet', series: 'isadora', year: 2016, emoji: '🩰', coverId: 13894388 },
+  { name: 'Isadora Moon Gets in Trouble', series: 'isadora', year: 2017, emoji: '😬', coverId: 8572280 },
+  { name: 'Isadora Moon Goes on a School Trip', series: 'isadora', year: 2017, emoji: '🚌', coverId: 10641392 },
+  { name: 'Isadora Moon Goes to the Fair', series: 'isadora', year: 2018, emoji: '🎡', coverId: 10898276 },
+  { name: 'Isadora Moon Makes Winter Magic', series: 'isadora', year: 2018, emoji: '❄️', coverId: 8452261 },
+  { name: 'Isadora Moon Has a Sleepover', series: 'isadora', year: 2019, emoji: '🛏️', coverId: 10132091 },
+  { name: 'Isadora Moon Puts on a Show', series: 'isadora', year: 2019, emoji: '🎭', coverId: 10641381 },
+  { name: 'Isadora Moon Goes on Holiday', series: 'isadora', year: 2020, emoji: '✈️', coverId: 10641397 },
+  { name: 'Isadora Moon Goes to a Wedding', series: 'isadora', year: 2021, emoji: '💒', coverId: 10641422 },
+  { name: 'Isadora Moon Meets the Tooth Fairy', series: 'isadora', year: 2021, emoji: '🦷' },
+  { name: 'Isadora Moon and the Shooting Star', series: 'isadora', year: 2021, emoji: '🌠' },
+  { name: 'Isadora Moon Gets the Magic Pox', series: 'isadora', year: 2022, emoji: '✨' },
+  { name: 'Isadora Moon Under the Sea', series: 'isadora', year: 2022, emoji: '🐚' },
+  { name: 'Isadora Moon and the New Girl', series: 'isadora', year: 2023, emoji: '👧' },
+  { name: 'Isadora Moon and the Frost Festival', series: 'isadora', year: 2023, emoji: '🧊' },
+  { name: 'Isadora Moon Helps Out', series: 'isadora', year: 2024, emoji: '🤝' },
+  { name: 'Isadora Moon Makes a Wish', series: 'isadora', year: 2024, emoji: '🌟' },
+  { name: 'Isadora Moon Rides a Bike', series: 'isadora', year: 2025, emoji: '🚲' },
+  { name: 'Isadora Moon and the Pop Stars', series: 'isadora', year: 2025, emoji: '🎤' },
+
+  // ── Mirabelle (15 books) ──
+  { name: 'Mirabelle Gets up to Mischief', series: 'mirabelle', year: 2020, emoji: '😈', coverId: 11000766 },
+  { name: 'Mirabelle Breaks the Rules', series: 'mirabelle', year: 2021, emoji: '📜' },
+  { name: 'Mirabelle Has a Bad Day', series: 'mirabelle', year: 2021, emoji: '😤', coverId: 11984988 },
+  { name: 'Mirabelle In Double Trouble', series: 'mirabelle', year: 2022, emoji: '👯' },
+  { name: 'Mirabelle and the Naughty Bat Kittens', series: 'mirabelle', year: 2022, emoji: '🦇' },
+  { name: 'Mirabelle and the Magical Mayhem', series: 'mirabelle', year: 2022, emoji: '💫' },
+  { name: 'Mirabelle Takes Charge', series: 'mirabelle', year: 2023, emoji: '👑' },
+  { name: 'Mirabelle Wants to Win', series: 'mirabelle', year: 2023, emoji: '🏆' },
+  { name: 'Mirabelle and the Haunted House', series: 'mirabelle', year: 2023, emoji: '👻' },
+  { name: 'Mirabelle and the Midnight Feast', series: 'mirabelle', year: 2024, emoji: '🌙' },
+  { name: 'Mirabelle and the Picnic Pranks', series: 'mirabelle', year: 2024, emoji: '🧺' },
+  { name: 'Mirabelle and the Baby Dragons', series: 'mirabelle', year: 2024, emoji: '🐉' },
+  { name: 'Mirabelle in Witch City', series: 'mirabelle', year: 2025, emoji: '🏙️' },
+  { name: 'Mirabelle and the Party Tricks', series: 'mirabelle', year: 2025, emoji: '🎩' },
+  { name: 'Mirabelle and the Enchanted Sea Globe', series: 'mirabelle', year: 2026, emoji: '🔮', isNew: true },
+
+  // ── Emerald (8 books) ──
+  { name: 'Emerald and the Ocean Parade', series: 'emerald', year: 2023, emoji: '🎊' },
+  { name: 'Emerald and the Sea Sprites', series: 'emerald', year: 2023, emoji: '🧚' },
+  { name: 'Emerald and the Lost Treasure', series: 'emerald', year: 2024, emoji: '💎' },
+  { name: 'Emerald and the Runaway Royal', series: 'emerald', year: 2024, emoji: '👸' },
+  { name: 'Emerald and the Magic Shell', series: 'emerald', year: 2025, emoji: '🐚' },
+  { name: 'Emerald and the New Arrival', series: 'emerald', year: 2025, emoji: '🐣' },
+  { name: 'Emerald and the Sea Dragon', series: 'emerald', year: 2026, emoji: '🐲', isNew: true },
+  { name: 'Emerald and the Pearly Turtles', series: 'emerald', year: 2026, emoji: '🐢', isNew: true }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   STATE MANAGEMENT
+   ═══════════════════════════════════════════════════════════ */
+const STORAGE_KEY = 'hm_collection_v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+function getBookState(bookName) {
+  return state[bookName] || { owned: false, wish: false };
+}
+
+function toggleOwned(bookName, cardEl) {
+  const bs = getBookState(bookName);
+  if (bs.owned) {
+    bs.owned = false;
+  } else {
+    bs.owned = true;
+    bs.wish = false;
+    // Trigger magic wand animation
+    playWandAnimation(cardEl);
+  }
+  state[bookName] = bs;
+  saveState(state);
+}
+
+function toggleWish(bookName) {
+  const bs = getBookState(bookName);
+  if (bs.wish) {
+    bs.wish = false;
+  } else if (!bs.owned) {
+    bs.wish = true;
+  }
+  state[bookName] = bs;
+  saveState(state);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MAGIC WAND ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+function playWandAnimation(cardEl) {
+  const overlay = document.getElementById('wandOverlay');
+  const rect = cardEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  // Wand emoji
+  const wand = document.createElement('div');
+  wand.className = 'wand';
+  wand.textContent = '🪄';
+  wand.style.left = (cx - 20) + 'px';
+  wand.style.top = (cy - 20) + 'px';
+  overlay.appendChild(wand);
+
+  // Sparkles
+  const colors = ['#C77DFF', '#9B8FE8', '#FFD93D', '#38BDF8', '#FF6B9D', '#6BCB77'];
+  for (let i = 0; i < 12; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'sparkle';
+    const angle = (i / 12) * Math.PI * 2;
+    const dist = 40 + Math.random() * 50;
+    spark.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    spark.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    spark.style.left = (cx - 4) + 'px';
+    spark.style.top = (cy - 4) + 'px';
+    spark.style.background = colors[i % colors.length];
+    spark.style.animationDelay = (Math.random() * 0.3) + 's';
+    overlay.appendChild(spark);
+  }
+
+  // Card glow
+  cardEl.classList.add('card-glow');
+
+  // Cleanup
+  setTimeout(() => {
+    overlay.innerHTML = '';
+    cardEl.classList.remove('card-glow');
+  }, 1500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STATISTICS HELPERS
+   ═══════════════════════════════════════════════════════════ */
+function computeStats(bookList) {
+  const total = bookList.filter(b => !b.isNew).length;
+  let owned = 0, wish = 0;
+  bookList.forEach(b => {
+    const bs = getBookState(b.name);
+    if (bs.owned) owned++;
+    if (bs.wish) wish++;
+  });
+  const pct = total > 0 ? Math.round((owned / total) * 100) : 0;
+  return { total, owned, wish, pct, allTotal: bookList.length };
+}
+
+function renderStatsBar(containerId, bookList) {
+  const s = computeStats(bookList);
+  const el = document.getElementById(containerId);
+  el.innerHTML = `
+    <div class="stat">
+      <div class="stat-num owned-color">${s.owned}</div>
+      <div class="stat-label">Owned</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:${s.pct}%"></div></div>
+      <div class="progress-text">${s.pct}% collected</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">${s.total}</div>
+      <div class="stat-label">Books</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num wish-color">${s.wish}</div>
+      <div class="stat-label">Wishlist</div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOOK CARD RENDERER
+   ═══════════════════════════════════════════════════════════ */
+function renderBookCard(book) {
+  const bs = getBookState(book.name);
+  const series = SERIES[book.series];
+  let classes = `book-card ${book.series}`;
+  if (bs.owned) classes += ' owned';
+  else if (bs.wish) classes += ' wish';
+
+  // Short title (remove series prefix for display)
+  let shortTitle = book.name;
+  if (book.series === 'isadora') shortTitle = shortTitle.replace('Isadora Moon ', '');
+  else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
+  else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
+
+  // Cover image or emoji fallback
+  const coverHtml = book.coverId
+    ? `<div class="book-cover-wrap"><img class="book-cover" src="https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg" alt="${book.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'"></div>`
+    : `<span class="book-emoji">${book.emoji}</span>`;
+
+  return `
+    <div class="${classes}" data-book="${book.name.replace(/"/g, '&quot;')}">
+      ${bs.owned ? '<div class="badge-owned">✓</div>' : ''}
+      ${bs.wish ? '<div class="badge-wish">⭐</div>' : ''}
+      ${book.isNew ? '<div class="badge-new">NEW</div>' : ''}
+      ${coverHtml}
+      <div class="book-title">${shortTitle}</div>
+      <div class="book-actions">
+        <button class="btn-have ${bs.owned ? 'active' : ''}" data-action="have">
+          ${bs.owned ? '✓ Got it!' : 'I have it'}
+        </button>
+        <button class="btn-wish ${bs.wish ? 'active' : ''}" data-action="wish">
+          ${bs.wish ? '⭐ Want!' : 'Want it'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN: HOME
+   ═══════════════════════════════════════════════════════════ */
+function renderHome() {
+  // Overall stats
+  renderStatsBar('homeStats', BOOKS);
+
+  // Character cards
+  const grid = document.getElementById('characterGrid');
+  let html = '';
+
+  Object.values(SERIES).forEach(s => {
+    const seriesBooks = BOOKS.filter(b => b.series === s.id);
+    const stats = computeStats(seriesBooks);
+
+    html += `
+      <div class="character-card ${s.id}" onclick="showCharacter('${s.id}')">
+        <div class="character-icon">
+          ${s.coverImg ? `<img class="character-img" src="${s.coverImg}" alt="${s.name}" onerror="this.parentElement.innerHTML='${s.icon}'">` : s.icon}
+        </div>
+        <div class="character-info">
+          <div class="character-name">${s.name}</div>
+          <div class="character-desc">${s.desc}</div>
+          <div class="character-progress">
+            <div class="character-progress-fill" style="width:${stats.pct}%"></div>
+          </div>
+          <div class="character-stats">${stats.owned} of ${stats.total} collected</div>
+        </div>
+        <div class="character-arrow">›</div>
+      </div>
+    `;
+  });
+
+  // All Books button
+  html += `
+    <button class="all-books-btn" onclick="showAllBooks()">
+      📚 See All Books
+    </button>
+  `;
+
+  grid.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN: CHARACTER PAGE
+   ═══════════════════════════════════════════════════════════ */
+let currentSeries = null;
+let charFilter = 'all';
+let charSearchQuery = '';
+
+function showCharacter(seriesId) {
+  currentSeries = seriesId;
+  charFilter = 'all';
+  charSearchQuery = '';
+
+  const s = SERIES[seriesId];
+  const header = document.getElementById('charHeader');
+  header.className = `sub-header ${seriesId}`;
+
+  document.getElementById('charTitle').textContent = s.name;
+
+  const seriesBooks = BOOKS.filter(b => b.series === seriesId);
+  const stats = computeStats(seriesBooks);
+  document.getElementById('charCount').textContent = `${stats.owned}/${stats.total}`;
+
+  // Search
+  const searchInput = document.getElementById('charSearch');
+  searchInput.value = '';
+  searchInput.oninput = () => {
+    charSearchQuery = searchInput.value.trim().toLowerCase();
+    renderCharacterGrid();
+  };
+
+  // Filters
+  renderCharacterFilters();
+  renderStatsBar('charStats', seriesBooks);
+  renderCharacterGrid();
+
+  switchScreen('screenCharacter');
+}
+
+function renderCharacterFilters() {
+  const row = document.getElementById('charFilters');
+  const filters = [
+    { key: 'all', label: 'All' },
+    { key: 'owned', label: '✓ Owned' },
+    { key: 'wish', label: '⭐ Wishlist' },
+    { key: 'new', label: '🆕 Coming Soon' }
+  ];
+  row.innerHTML = filters.map(f =>
+    `<button class="filter-btn ${charFilter === f.key ? 'active' : ''}" onclick="setCharFilter('${f.key}')">${f.label}</button>`
+  ).join('');
+}
+
+function setCharFilter(key) {
+  charFilter = key;
+  renderCharacterFilters();
+  renderCharacterGrid();
+}
+
+function renderCharacterGrid() {
+  const grid = document.getElementById('charGrid');
+  let books = BOOKS.filter(b => b.series === currentSeries);
+
+  // Apply filter
+  books = applyFilter(books, charFilter);
+
+  // Apply search
+  if (charSearchQuery) {
+    books = books.filter(b => b.name.toLowerCase().includes(charSearchQuery));
+  }
+
+  if (books.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📖</div>
+        <div class="empty-text">No books found!</div>
+      </div>
+    `;
+  } else {
+    grid.innerHTML = books.map(renderBookCard).join('');
+    attachCardListeners(grid);
+  }
+
+  // Update count
+  const seriesBooks = BOOKS.filter(b => b.series === currentSeries);
+  const stats = computeStats(seriesBooks);
+  document.getElementById('charCount').textContent = `${stats.owned}/${stats.total}`;
+  renderStatsBar('charStats', seriesBooks);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN: ALL BOOKS
+   ═══════════════════════════════════════════════════════════ */
+let allFilter = 'all';
+let allSearchQuery = '';
+let allSortAlpha = false;
+
+function showAllBooks() {
+  allFilter = 'all';
+  allSearchQuery = '';
+
+  const stats = computeStats(BOOKS);
+  document.getElementById('allCount').textContent = `${stats.owned}/${stats.total}`;
+
+  const searchInput = document.getElementById('allSearch');
+  searchInput.value = '';
+  searchInput.oninput = () => {
+    allSearchQuery = searchInput.value.trim().toLowerCase();
+    renderAllGrid();
+  };
+
+  renderAllFilters();
+  renderStatsBar('allStats', BOOKS);
+  renderAllGrid();
+
+  switchScreen('screenAll');
+}
+
+function renderAllFilters() {
+  const row = document.getElementById('allFilters');
+  const filters = [
+    { key: 'all', label: 'All' },
+    { key: 'owned', label: '✓ Owned' },
+    { key: 'wish', label: '⭐ Wishlist' },
+    { key: 'new', label: '🆕 Coming Soon' }
+  ];
+  // Series filters
+  Object.values(SERIES).forEach(s => {
+    filters.push({ key: 'series_' + s.id, label: s.icon + ' ' + s.name });
+  });
+
+  let html = filters.map(f =>
+    `<button class="filter-btn ${allFilter === f.key ? 'active' : ''}" onclick="setAllFilter('${f.key}')">${f.label}</button>`
+  ).join('');
+
+  // Sort toggle
+  html += `<button class="sort-btn ${allSortAlpha ? 'active' : ''}" onclick="toggleAllSort()">
+    ${allSortAlpha ? 'A→Z' : '📖 Order'}
+  </button>`;
+
+  row.innerHTML = html;
+}
+
+function setAllFilter(key) {
+  allFilter = key;
+  renderAllFilters();
+  renderAllGrid();
+}
+
+function toggleAllSort() {
+  allSortAlpha = !allSortAlpha;
+  renderAllFilters();
+  renderAllGrid();
+}
+
+function renderAllGrid() {
+  const grid = document.getElementById('allGrid');
+  let books = [...BOOKS];
+
+  // Series filter
+  if (allFilter.startsWith('series_')) {
+    const sid = allFilter.replace('series_', '');
+    books = books.filter(b => b.series === sid);
+  } else {
+    books = applyFilter(books, allFilter);
+  }
+
+  // Search
+  if (allSearchQuery) {
+    books = books.filter(b => b.name.toLowerCase().includes(allSearchQuery));
+  }
+
+  // Sort
+  if (allSortAlpha) {
+    books.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  if (books.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📖</div>
+        <div class="empty-text">No books found!</div>
+      </div>
+    `;
+  } else if (!allSortAlpha && !allSearchQuery && allFilter === 'all') {
+    // Group by series
+    let html = '';
+    Object.values(SERIES).forEach(s => {
+      const seriesBooks = books.filter(b => b.series === s.id);
+      if (seriesBooks.length === 0) return;
+      html += `<div class="series-heading"><span class="dot" style="background:${s.color}"></span>${s.name}</div>`;
+      html += seriesBooks.map(renderBookCard).join('');
+    });
+    grid.innerHTML = html;
+    attachCardListeners(grid);
+  } else {
+    grid.innerHTML = books.map(renderBookCard).join('');
+    attachCardListeners(grid);
+  }
+
+  // Update stats
+  const stats = computeStats(BOOKS);
+  document.getElementById('allCount').textContent = `${stats.owned}/${stats.total}`;
+  renderStatsBar('allStats', BOOKS);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FILTER HELPER
+   ═══════════════════════════════════════════════════════════ */
+function applyFilter(books, filter) {
+  switch (filter) {
+    case 'owned': return books.filter(b => getBookState(b.name).owned);
+    case 'wish': return books.filter(b => getBookState(b.name).wish);
+    case 'new': return books.filter(b => b.isNew);
+    default: return books;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CARD EVENT LISTENERS
+   ═══════════════════════════════════════════════════════════ */
+function attachCardListeners(container) {
+  container.querySelectorAll('.book-card').forEach(card => {
+    const bookName = card.getAttribute('data-book');
+
+    card.querySelector('.btn-have').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleOwned(bookName, card);
+      refreshCurrentScreen();
+    });
+
+    card.querySelector('.btn-wish').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWish(bookName);
+      refreshCurrentScreen();
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════════ */
+function switchScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showHome() {
+  renderHome();
+  switchScreen('screenHome');
+}
+
+function refreshCurrentScreen() {
+  const active = document.querySelector('.screen.active');
+  if (active.id === 'screenHome') renderHome();
+  else if (active.id === 'screenCharacter') renderCharacterGrid();
+  else if (active.id === 'screenAll') renderAllGrid();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+renderHome();
+</script>
+</body>
+</html>
