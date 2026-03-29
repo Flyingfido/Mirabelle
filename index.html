@@ -607,26 +607,47 @@ body::before {
   100% { transform: rotate(0deg) scale(0.5); opacity: 0; }
 }
 
-.sparkle {
+.rainbow-particle {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  animation: sparkleFloat 1s ease-out forwards;
+  animation: rainbowArc 1s ease-out forwards;
   pointer-events: none;
+  filter: blur(0.5px);
 }
-@keyframes sparkleFloat {
-  0% { transform: translate(0, 0) scale(0); opacity: 1; }
-  50% { opacity: 1; }
-  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+@keyframes rainbowArc {
+  0% { transform: translate(0, 0) scale(0); opacity: 0; }
+  15% { transform: translate(calc(var(--tx) * 0.15), calc(var(--ty) * 0.15 - 20px)) scale(1.5); opacity: 1; }
+  50% { transform: translate(calc(var(--tx) * 0.6), calc(var(--ty) * 0.6 - 35px)) scale(1.2); opacity: 1; }
+  80% { transform: translate(calc(var(--tx) * 0.9), calc(var(--ty) * 0.9 - 15px)) scale(0.8); opacity: 0.8; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0.3); opacity: 0; }
+}
+
+.rainbow-trail {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: trailFade 0.6s ease-out forwards;
+  pointer-events: none;
+  opacity: 0.6;
+}
+@keyframes trailFade {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(0); opacity: 0; }
 }
 
 .card-glow {
-  animation: glowPulse 0.8s ease-out;
+  animation: rainbowGlow 1s ease-out;
 }
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 0 0 rgba(155, 143, 232, 0.5); }
-  50% { box-shadow: 0 0 20px 10px rgba(155, 143, 232, 0.3); }
+@keyframes rainbowGlow {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); }
+  16% { box-shadow: 0 0 15px 5px rgba(255, 165, 0, 0.3); }
+  33% { box-shadow: 0 0 20px 8px rgba(255, 255, 0, 0.3); }
+  50% { box-shadow: 0 0 20px 10px rgba(0, 200, 0, 0.3); }
+  66% { box-shadow: 0 0 15px 8px rgba(0, 100, 255, 0.3); }
+  83% { box-shadow: 0 0 10px 5px rgba(130, 0, 255, 0.3); }
   100% { box-shadow: 0 3px 12px var(--card-shadow); }
 }
 
@@ -793,42 +814,42 @@ const BOOKS = [
   { name: 'Isadora Moon Puts on a Show', series: 'isadora', year: 2019, emoji: '🎭', coverId: 10641381, isbn: '9780192777188' },
   { name: 'Isadora Moon Goes on Holiday', series: 'isadora', year: 2020, emoji: '✈️', coverId: 10641397, isbn: '9780192771643' },
   { name: 'Isadora Moon Goes to a Wedding', series: 'isadora', year: 2021, emoji: '💒', coverId: 10641422, isbn: '9780192779533' },
-  { name: 'Isadora Moon Meets the Tooth Fairy', series: 'isadora', year: 2021, emoji: '🦷', isbn: '9780192773548' },
-  { name: 'Isadora Moon and the Shooting Star', series: 'isadora', year: 2021, emoji: '🌠', isbn: '9780192783455' },
-  { name: 'Isadora Moon Gets the Magic Pox', series: 'isadora', year: 2022, emoji: '✨', isbn: '9780192773562' },
-  { name: 'Isadora Moon Under the Sea', series: 'isadora', year: 2022, emoji: '🐚', isbn: '9780192788788' },
-  { name: 'Isadora Moon and the New Girl', series: 'isadora', year: 2023, emoji: '👧', isbn: '9780192778086' },
-  { name: 'Isadora Moon and the Frost Festival', series: 'isadora', year: 2023, emoji: '🧊', isbn: '9780192788764' },
-  { name: 'Isadora Moon Helps Out', series: 'isadora', year: 2024, emoji: '🤝', isbn: '9780192778109' },
-  { name: 'Isadora Moon Makes a Wish', series: 'isadora', year: 2024, emoji: '🌟', isbn: '9780192788771' },
-  { name: 'Isadora Moon Rides a Bike', series: 'isadora', year: 2025, emoji: '🚲', isbn: '9780192787842' },
-  { name: 'Isadora Moon and the Pop Stars', series: 'isadora', year: 2025, emoji: '🎤', isbn: '9780192787866' },
+  { name: 'Isadora Moon Meets the Tooth Fairy', series: 'isadora', year: 2021, emoji: '🦷', isbn: '9780192773548', googleCover: 'https://books.google.com/books/content?id=GEHAzQEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon and the Shooting Star', series: 'isadora', year: 2021, emoji: '🌠', isbn: '9780192783455', googleCover: 'https://books.google.com/books/content?id=gVuQzgEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon Gets the Magic Pox', series: 'isadora', year: 2022, emoji: '✨', isbn: '9780192773562', googleCover: 'https://books.google.com/books/content?id=b6aHzgEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon Under the Sea', series: 'isadora', year: 2022, emoji: '🐚', isbn: '9780192788788', googleCover: 'https://books.google.com/books/content?id=o9y6zwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon and the New Girl', series: 'isadora', year: 2023, emoji: '👧', isbn: '9780192778086', googleCover: 'https://books.google.com/books/content?id=EnQ6zwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon and the Frost Festival', series: 'isadora', year: 2023, emoji: '🧊', isbn: '9780192788764', googleCover: 'https://books.google.com/books/content?id=I9BZ0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon Helps Out', series: 'isadora', year: 2024, emoji: '🤝', isbn: '9780192778109', googleCover: 'https://books.google.com/books/content?id=tlQN0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon Makes a Wish', series: 'isadora', year: 2024, emoji: '🌟', isbn: '9780192788771', googleCover: 'https://books.google.com/books/content?id=bMfK0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon Rides a Bike', series: 'isadora', year: 2025, emoji: '🚲', isbn: '9780192787842', googleCover: 'https://books.google.com/books/content?id=6LHW0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Isadora Moon and the Pop Stars', series: 'isadora', year: 2025, emoji: '🎤', isbn: '9780192787866', googleCover: 'https://books.google.com/books/content?id=u-1F0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
 
   // ── Mirabelle (15 books) ──
   { name: 'Mirabelle Gets up to Mischief', series: 'mirabelle', year: 2020, emoji: '😈', coverId: 11000766, isbn: '9780192776495' },
   { name: 'Mirabelle Breaks the Rules', series: 'mirabelle', year: 2021, emoji: '📜', coverId: 13854947, isbn: '9780192777546' },
   { name: 'Mirabelle Has a Bad Day', series: 'mirabelle', year: 2021, emoji: '😤', coverId: 11984988, isbn: '9780192777553' },
-  { name: 'Mirabelle In Double Trouble', series: 'mirabelle', year: 2022, emoji: '👯', isbn: '9780192777560' },
-  { name: 'Mirabelle and the Naughty Bat Kittens', series: 'mirabelle', year: 2022, emoji: '🦇', isbn: '9780192777577' },
-  { name: 'Mirabelle and the Magical Mayhem', series: 'mirabelle', year: 2022, emoji: '💫', isbn: '9780192777584' },
-  { name: 'Mirabelle Takes Charge', series: 'mirabelle', year: 2023, emoji: '👑', isbn: '9780192783721' },
-  { name: 'Mirabelle Wants to Win', series: 'mirabelle', year: 2023, emoji: '🏆', isbn: '9780192783745' },
-  { name: 'Mirabelle and the Haunted House', series: 'mirabelle', year: 2023, emoji: '👻', isbn: '9780192788726' },
-  { name: 'Mirabelle and the Midnight Feast', series: 'mirabelle', year: 2024, emoji: '🌙', isbn: '9780192783783' },
-  { name: 'Mirabelle and the Picnic Pranks', series: 'mirabelle', year: 2024, emoji: '🧺', isbn: '9780192787965' },
-  { name: 'Mirabelle and the Baby Dragons', series: 'mirabelle', year: 2024, emoji: '🐉', isbn: '9780192787996' },
-  { name: 'Mirabelle in Witch City', series: 'mirabelle', year: 2025, emoji: '🏙️', isbn: '9780192788016' },
-  { name: 'Mirabelle and the Party Tricks', series: 'mirabelle', year: 2025, emoji: '🎩', isbn: '9780192788030' },
-  { name: 'Mirabelle and the Enchanted Sea Globe', series: 'mirabelle', year: 2026, emoji: '🔮', isNew: true, isbn: '9780192788061' },
+  { name: 'Mirabelle In Double Trouble', series: 'mirabelle', year: 2022, emoji: '👯', isbn: '9780192777560', googleCover: 'https://books.google.com/books/content?id=iW-IzgEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Naughty Bat Kittens', series: 'mirabelle', year: 2022, emoji: '🦇', isbn: '9780192777577', googleCover: 'https://books.google.com/books/content?id=Jqq6zgEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Magical Mayhem', series: 'mirabelle', year: 2022, emoji: '💫', isbn: '9780192777584', googleCover: 'https://books.google.com/books/content?id=ZMXvzgEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle Takes Charge', series: 'mirabelle', year: 2023, emoji: '👑', isbn: '9780192783721', googleCover: 'https://books.google.com/books/content?id=jaQ6zwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle Wants to Win', series: 'mirabelle', year: 2023, emoji: '🏆', isbn: '9780192783745', googleCover: 'https://books.google.com/books/content?id=SbKBzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Haunted House', series: 'mirabelle', year: 2023, emoji: '👻', isbn: '9780192788726', googleCover: 'https://books.google.com/books/content?id=owarzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Midnight Feast', series: 'mirabelle', year: 2024, emoji: '🌙', isbn: '9780192783783', googleCover: 'https://books.google.com/books/content?id=MJYM0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Picnic Pranks', series: 'mirabelle', year: 2024, emoji: '🧺', isbn: '9780192787965', googleCover: 'https://books.google.com/books/content?id=FgZa0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Baby Dragons', series: 'mirabelle', year: 2024, emoji: '🐉', isbn: '9780192787996', googleCover: 'https://books.google.com/books/content?id=NBHP0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle in Witch City', series: 'mirabelle', year: 2025, emoji: '🏙️', isbn: '9780192788016', googleCover: 'https://books.google.com/books/content?id=9MnQ0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Party Tricks', series: 'mirabelle', year: 2025, emoji: '🎩', isbn: '9780192788030', googleCover: 'https://books.google.com/books/content?id=7-Qd0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Mirabelle and the Enchanted Sea Globe', series: 'mirabelle', year: 2026, emoji: '🔮', isNew: true, isbn: '9780192788061', googleCover: 'https://books.google.com/books/content?id=fOGm0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
 
   // ── Emerald (8 books) ──
-  { name: 'Emerald and the Ocean Parade', series: 'emerald', year: 2023, emoji: '🎊', isbn: '9780192788733' },
-  { name: 'Emerald and the Sea Sprites', series: 'emerald', year: 2023, emoji: '🧚', isbn: '9780192783998' },
-  { name: 'Emerald and the Lost Treasure', series: 'emerald', year: 2024, emoji: '💎', isbn: '9780192784018' },
-  { name: 'Emerald and the Runaway Royal', series: 'emerald', year: 2024, emoji: '👸', isbn: '9780192784032' },
-  { name: 'Emerald and the Magic Shell', series: 'emerald', year: 2025, emoji: '🐚', isbn: '9780192784056' },
-  { name: 'Emerald and the New Arrival', series: 'emerald', year: 2025, emoji: '🐣', isbn: '9780192784070' },
-  { name: 'Emerald and the Sea Dragon', series: 'emerald', year: 2026, emoji: '🐲', isNew: true, isbn: '9781382073004' },
+  { name: 'Emerald and the Ocean Parade', series: 'emerald', year: 2023, emoji: '🎊', isbn: '9780192788733', googleCover: 'https://books.google.com/books/content?id=O2urzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Emerald and the Sea Sprites', series: 'emerald', year: 2023, emoji: '🧚', isbn: '9780192783998', googleCover: 'https://books.google.com/books/content?id=E16GzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Emerald and the Lost Treasure', series: 'emerald', year: 2024, emoji: '💎', isbn: '9780192784018', googleCover: 'https://books.google.com/books/content?id=AssM0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Emerald and the Runaway Royal', series: 'emerald', year: 2024, emoji: '👸', isbn: '9780192784032', googleCover: 'https://books.google.com/books/content?id=tjzP0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Emerald and the Magic Shell', series: 'emerald', year: 2025, emoji: '🐚', isbn: '9780192784056', googleCover: 'https://books.google.com/books/content?id=WIfZ0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Emerald and the New Arrival', series: 'emerald', year: 2025, emoji: '🐣', isbn: '9780192784070', googleCover: 'https://books.google.com/books/content?id=010I0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
+  { name: 'Emerald and the Sea Dragon', series: 'emerald', year: 2026, emoji: '🐲', isNew: true, isbn: '9781382073004', googleCover: 'https://books.google.com/books/content?id=etmm0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api' },
   { name: 'Emerald and the Pearly Turtles', series: 'emerald', year: 2026, emoji: '🐢', isNew: true }
 ];
 
@@ -896,30 +917,48 @@ function playWandAnimation(cardEl) {
   wand.style.top = (cy - 20) + 'px';
   overlay.appendChild(wand);
 
-  // Sparkles
-  const colors = ['#C77DFF', '#9B8FE8', '#FFD93D', '#38BDF8', '#FF6B9D', '#6BCB77'];
-  for (let i = 0; i < 12; i++) {
-    const spark = document.createElement('div');
-    spark.className = 'sparkle';
-    const angle = (i / 12) * Math.PI * 2;
-    const dist = 40 + Math.random() * 50;
-    spark.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-    spark.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
-    spark.style.left = (cx - 4) + 'px';
-    spark.style.top = (cy - 4) + 'px';
-    spark.style.background = colors[i % colors.length];
-    spark.style.animationDelay = (Math.random() * 0.3) + 's';
-    overlay.appendChild(spark);
+  // Rainbow particles — 7 colours arcing upward in a semicircle
+  const rainbow = ['#FF0000', '#FF8C00', '#FFD700', '#00CC44', '#0088FF', '#4400CC', '#8B00FF'];
+  const particleCount = 21; // 3 particles per colour
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'rainbow-particle';
+
+    // Spread particles in a semicircular arc (upward)
+    const arcAngle = Math.PI + (i / (particleCount - 1)) * Math.PI; // PI to 2*PI (upward arc)
+    const dist = 50 + (i % 3) * 20; // Stagger distances for depth
+    const tx = Math.cos(arcAngle) * dist;
+    const ty = Math.sin(arcAngle) * dist - 20; // Bias upward
+
+    particle.style.setProperty('--tx', tx + 'px');
+    particle.style.setProperty('--ty', ty + 'px');
+    particle.style.left = (cx - 5) + 'px';
+    particle.style.top = (cy - 5) + 'px';
+    particle.style.background = rainbow[i % rainbow.length];
+    particle.style.boxShadow = `0 0 6px ${rainbow[i % rainbow.length]}`;
+    particle.style.animationDelay = (i * 0.03) + 's';
+    overlay.appendChild(particle);
+
+    // Add trailing particles for a rainbow streak effect
+    setTimeout(() => {
+      const trail = document.createElement('div');
+      trail.className = 'rainbow-trail';
+      trail.style.left = (cx - 3 + tx * 0.4) + 'px';
+      trail.style.top = (cy - 3 + ty * 0.4) + 'px';
+      trail.style.background = rainbow[i % rainbow.length];
+      overlay.appendChild(trail);
+    }, 200 + i * 30);
   }
 
-  // Card glow
+  // Card glow (rainbow cycle)
   cardEl.classList.add('card-glow');
 
-  // Cleanup
+  // Cleanup after 1 second
   setTimeout(() => {
     overlay.innerHTML = '';
     cardEl.classList.remove('card-glow');
-  }, 1500);
+  }, 1200);
 }
 
 /* ═══════════════════════════════════════════════════════════
