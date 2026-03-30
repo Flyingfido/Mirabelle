@@ -767,6 +767,17 @@ body::before {
 
 <script>
 /* ═══════════════════════════════════════════════════════════
+   ISBN-13 → ISBN-10 CONVERTER (for Amazon CDN cover URLs)
+   ═══════════════════════════════════════════════════════════ */
+function isbn13to10(isbn13) {
+  const body = isbn13.substring(3, 12);
+  let total = 0;
+  for (let i = 0; i < 9; i++) total += (10 - i) * parseInt(body[i]);
+  const check = (11 - (total % 11)) % 11;
+  return body + (check === 10 ? 'X' : String(check));
+}
+
+/* ═══════════════════════════════════════════════════════════
    DATA
    ═══════════════════════════════════════════════════════════ */
 const SERIES = {
@@ -1015,11 +1026,11 @@ function renderBookCard(book) {
   else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
   else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
 
-  // Cover image: try coverId first, then Google Books, then ISBN, then emoji fallback
+  // Cover image: try coverId first, then Amazon CDN (by ISBN-10), then Google Books, then emoji fallback
   let coverUrl = null;
   if (book.coverId) coverUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`;
+  else if (book.isbn) coverUrl = `https://m.media-amazon.com/images/P/${isbn13to10(book.isbn)}.01._SCLZZZZZZZ_SX500_.jpg`;
   else if (book.googleCover) coverUrl = book.googleCover;
-  else if (book.isbn) coverUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`;
 
   const coverHtml = coverUrl
     ? `<div class="book-cover-wrap"><img class="book-cover" src="${coverUrl}" alt="${book.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'"></div>`
@@ -1349,7 +1360,7 @@ function refreshCurrentScreen() {
    GOOGLE BOOKS COVER FETCHER (fills missing covers at runtime)
    ═══════════════════════════════════════════════════════════ */
 async function fetchMissingCovers() {
-  const CACHE_KEY = 'hm_gcovers_v2';
+  const CACHE_KEY = 'hm_gcovers_v3';
   let cache = {};
   try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch {}
 
