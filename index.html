@@ -838,7 +838,7 @@ const SERIES = {
     desc: 'Half vampire, half fairy, totally unique!',
     color: '#C77DFF',
     colorLight: '#E8C5FF',
-    coverImg: 'https://covers.openlibrary.org/b/id/8572936-M.jpg'
+    coverImg: 'covers/isadora-moon-goes-to-school.jpg'
   },
   mirabelle: {
     id: 'mirabelle',
@@ -847,7 +847,7 @@ const SERIES = {
     desc: 'Half witch, half fairy, totally naughty!',
     color: '#7C6FE0',
     colorLight: '#B5ADFF',
-    coverImg: 'https://covers.openlibrary.org/b/id/11000766-M.jpg'
+    coverImg: 'covers/mirabelle-gets-up-to-mischief.jpg'
   },
   emerald: {
     id: 'emerald',
@@ -856,7 +856,7 @@ const SERIES = {
     desc: 'A mermaid princess with big adventures!',
     color: '#38BDF8',
     colorLight: '#A5DFFF',
-    coverImg: 'https://books.google.com/books/content?id=O2urzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api'
+    coverImg: 'covers/emerald-and-the-ocean-parade.jpg'
   }
 };
 
@@ -1137,22 +1137,21 @@ function renderBookCard(book) {
   else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
   else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
 
-  // Build ordered list of cover URLs to try (cascading fallback)
-  const coverSources = [];
-  if (book.coverId) coverSources.push(`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`);
-  if (book.googleCover) coverSources.push(book.googleCover);
-  if (book.isbn) {
-    coverSources.push(`https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`);
-    coverSources.push(`https://m.media-amazon.com/images/P/${isbn13to10(book.isbn)}.01._SCLZZZZZZZ_SX500_.jpg`);
-  }
+  // Cover image: use local file first, then API fallbacks, then emoji
+  const slug = book.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+  const localCover = `covers/${slug}.jpg`;
 
-  let coverHtml;
-  if (coverSources.length > 0) {
-    const fallbacksJson = JSON.stringify(coverSources.slice(1));
-    coverHtml = `<div class="book-cover-wrap"><img class="book-cover" src="${coverSources[0]}" alt="${book.name}" loading="lazy" data-fallbacks='${fallbacksJson}' data-emoji="${book.emoji}" onerror="tryNextCover(this)"></div>`;
-  } else {
-    coverHtml = `<span class="book-emoji">${book.emoji}</span>`;
-  }
+  // Primary: local file. Fallback chain: coverId → googleCover → ISBN → emoji
+  let fallbackUrl = null;
+  if (book.coverId) fallbackUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`;
+  else if (book.googleCover) fallbackUrl = book.googleCover;
+  else if (book.isbn) fallbackUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`;
+
+  const fallbackJs = fallbackUrl
+    ? `this.onerror=function(){this.parentElement.innerHTML='<span class=\\\\'book-emoji\\\\'>${book.emoji}</span>'};this.src='${fallbackUrl}'`
+    : `this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'`;
+
+  const coverHtml = `<div class="book-cover-wrap"><img class="book-cover" src="${localCover}" alt="${book.name}" loading="lazy" onerror="${fallbackJs}"></div>`;
 
   return `
     <div class="${classes}" data-book="${book.name.replace(/"/g, '&quot;')}">
@@ -1475,60 +1474,9 @@ function refreshCurrentScreen() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   GOOGLE BOOKS COVER FETCHER (fills missing covers at runtime)
-   ═══════════════════════════════════════════════════════════ */
-async function fetchMissingCovers() {
-  const CACHE_KEY = 'hm_gcovers_v3';
-  let cache = {};
-  try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch {}
-
-  const missing = BOOKS.filter(b => !b.coverId && !(b.name in cache));
-  if (missing.length === 0) {
-    BOOKS.forEach(b => { if (!b.coverId && cache[b.name]) b.googleCover = cache[b.name]; });
-    refreshCurrentScreen();
-    return;
-  }
-
-  let found = 0;
-  for (let i = 0; i < missing.length; i++) {
-    const book = missing[i];
-    let thumb = null;
-    try {
-      // Try ISBN first
-      if (book.isbn) {
-        const r1 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${book.isbn}&fields=items(volumeInfo/imageLinks)`);
-        const d1 = await r1.json();
-        thumb = d1.items?.[0]?.volumeInfo?.imageLinks?.thumbnail;
-      }
-      // Fallback: title search
-      if (!thumb) {
-        const q = encodeURIComponent(book.name + ' harriet muncaster');
-        const r2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${q}&fields=items(volumeInfo/imageLinks)&maxResults=1`);
-        const d2 = await r2.json();
-        thumb = d2.items?.[0]?.volumeInfo?.imageLinks?.thumbnail;
-      }
-      if (thumb) {
-        const url = thumb.replace('http://', 'https://').replace('zoom=1', 'zoom=2');
-        cache[book.name] = url;
-        book.googleCover = url;
-        found++;
-      } else {
-        cache[book.name] = '';
-      }
-    } catch { cache[book.name] = ''; }
-    await new Promise(r => setTimeout(r, 350));
-  }
-
-  localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-  BOOKS.forEach(b => { if (!b.coverId && cache[b.name]) b.googleCover = cache[b.name]; });
-  if (found > 0) refreshCurrentScreen();
-}
-
-/* ═══════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════ */
 renderHome();
-fetchMissingCovers();
 </script>
 </body>
 </html>
