@@ -839,7 +839,7 @@ const SERIES = {
     desc: 'A mermaid princess with big adventures!',
     color: '#38BDF8',
     colorLight: '#A5DFFF',
-    coverImg: 'https://covers.openlibrary.org/b/id/14346816-M.jpg'
+    coverImg: 'https://books.google.com/books/content?id=O2urzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api'
   }
 };
 
@@ -926,8 +926,9 @@ function toggleOwned(bookName, cardEl) {
   } else {
     bs.owned = true;
     bs.wish = false;
-    // Trigger magic wand animation
-    playWandAnimation(cardEl);
+    // Trigger magic wand animation — look up series from book data
+    const book = BOOKS.find(b => b.name === bookName);
+    playWandAnimation(cardEl, book ? book.series : null);
   }
   state[bookName] = bs;
   saveState(state);
@@ -947,7 +948,7 @@ function toggleWish(bookName) {
 /* ═══════════════════════════════════════════════════════════
    MAGIC WAND ANIMATION
    ═══════════════════════════════════════════════════════════ */
-function playWandAnimation(cardEl) {
+function playWandAnimation(cardEl, seriesId) {
   const overlay = document.getElementById('wandOverlay');
   const rect = cardEl.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
@@ -961,9 +962,10 @@ function playWandAnimation(cardEl) {
   wand.style.top = (cy - 20) + 'px';
   overlay.appendChild(wand);
 
-  if (currentSeries === 'isadora') {
+  const series = seriesId || currentSeries;
+  if (series === 'isadora') {
     playBatAnimation(overlay, cx, cy);
-  } else if (currentSeries === 'emerald') {
+  } else if (series === 'emerald') {
     playWaterAnimation(overlay, cx, cy);
   } else {
     playRainbowAnimation(overlay, cx, cy);
@@ -1118,11 +1120,11 @@ function renderBookCard(book) {
   else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
   else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
 
-  // Cover image: try coverId first, then Amazon CDN (by ISBN-10), then Google Books, then emoji fallback
+  // Cover image: try coverId first, then Google Books, then Amazon CDN (by ISBN-10), then emoji fallback
   let coverUrl = null;
   if (book.coverId) coverUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`;
-  else if (book.isbn) coverUrl = `https://m.media-amazon.com/images/P/${isbn13to10(book.isbn)}.01._SCLZZZZZZZ_SX500_.jpg`;
   else if (book.googleCover) coverUrl = book.googleCover;
+  else if (book.isbn) coverUrl = `https://m.media-amazon.com/images/P/${isbn13to10(book.isbn)}.01._SCLZZZZZZZ_SX500_.jpg`;
 
   const coverHtml = coverUrl
     ? `<div class="book-cover-wrap"><img class="book-cover" src="${coverUrl}" alt="${book.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'"></div>`
