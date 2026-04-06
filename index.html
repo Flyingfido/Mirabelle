@@ -639,6 +639,38 @@ body::before {
   100% { transform: scale(0); opacity: 0; }
 }
 
+/* Bat particles (Isadora) */
+.bat-particle {
+  position: absolute;
+  font-size: 18px;
+  animation: batFly 1.2s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes batFly {
+  0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 0; }
+  20% { transform: translate(calc(var(--tx) * 0.2), calc(var(--ty) * 0.2)) scale(1.2) rotate(calc(var(--rot) * 0.3)); opacity: 1; }
+  60% { transform: translate(calc(var(--tx) * 0.7), calc(var(--ty) * 0.7 - 30px)) scale(1) rotate(calc(var(--rot) * 0.7)); opacity: 0.9; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(var(--rot)); opacity: 0; }
+}
+
+/* Water particles (Emerald) */
+.water-particle {
+  position: absolute;
+  width: 8px;
+  height: 12px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: waterFountain 1s ease-out forwards;
+  pointer-events: none;
+  filter: blur(0.3px);
+}
+@keyframes waterFountain {
+  0% { transform: translate(0, 0) scale(0); opacity: 0; }
+  20% { transform: translate(calc(var(--tx) * 0.2), calc(var(--ty) * 0.4)) scale(1.3); opacity: 1; }
+  50% { transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.8)) scale(1); opacity: 0.9; }
+  75% { transform: translate(calc(var(--tx) * 0.8), calc(var(--ty) * 0.5)) scale(0.8); opacity: 0.7; }
+  100% { transform: translate(var(--tx), calc(var(--ty) + 40px)) scale(0.4); opacity: 0; }
+}
+
 .card-glow {
   animation: rainbowGlow 1s ease-out;
 }
@@ -929,19 +961,36 @@ function playWandAnimation(cardEl) {
   wand.style.top = (cy - 20) + 'px';
   overlay.appendChild(wand);
 
-  // Rainbow particles — 7 colours arcing upward in a semicircle
+  if (currentSeries === 'isadora') {
+    playBatAnimation(overlay, cx, cy);
+  } else if (currentSeries === 'emerald') {
+    playWaterAnimation(overlay, cx, cy);
+  } else {
+    playRainbowAnimation(overlay, cx, cy);
+  }
+
+  // Card glow (rainbow cycle)
+  cardEl.classList.add('card-glow');
+
+  // Cleanup after animation
+  setTimeout(() => {
+    overlay.innerHTML = '';
+    cardEl.classList.remove('card-glow');
+  }, 1200);
+}
+
+function playRainbowAnimation(overlay, cx, cy) {
   const rainbow = ['#FF0000', '#FF8C00', '#FFD700', '#00CC44', '#0088FF', '#4400CC', '#8B00FF'];
-  const particleCount = 21; // 3 particles per colour
+  const particleCount = 21;
 
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement('div');
     particle.className = 'rainbow-particle';
 
-    // Spread particles in a semicircular arc (upward)
-    const arcAngle = Math.PI + (i / (particleCount - 1)) * Math.PI; // PI to 2*PI (upward arc)
-    const dist = 50 + (i % 3) * 20; // Stagger distances for depth
+    const arcAngle = Math.PI + (i / (particleCount - 1)) * Math.PI;
+    const dist = 50 + (i % 3) * 20;
     const tx = Math.cos(arcAngle) * dist;
-    const ty = Math.sin(arcAngle) * dist - 20; // Bias upward
+    const ty = Math.sin(arcAngle) * dist - 20;
 
     particle.style.setProperty('--tx', tx + 'px');
     particle.style.setProperty('--ty', ty + 'px');
@@ -952,7 +1001,6 @@ function playWandAnimation(cardEl) {
     particle.style.animationDelay = (i * 0.03) + 's';
     overlay.appendChild(particle);
 
-    // Add trailing particles for a rainbow streak effect
     setTimeout(() => {
       const trail = document.createElement('div');
       trail.className = 'rainbow-trail';
@@ -962,15 +1010,58 @@ function playWandAnimation(cardEl) {
       overlay.appendChild(trail);
     }, 200 + i * 30);
   }
+}
 
-  // Card glow (rainbow cycle)
-  cardEl.classList.add('card-glow');
+function playBatAnimation(overlay, cx, cy) {
+  const batCount = 12;
+  const batEmojis = ['🦇'];
 
-  // Cleanup after 1 second
-  setTimeout(() => {
-    overlay.innerHTML = '';
-    cardEl.classList.remove('card-glow');
-  }, 1200);
+  for (let i = 0; i < batCount; i++) {
+    const bat = document.createElement('div');
+    bat.className = 'bat-particle';
+    bat.textContent = batEmojis[0];
+
+    // Scatter bats in random upward directions
+    const angle = Math.PI + (Math.random() * Math.PI); // upward semicircle
+    const dist = 40 + Math.random() * 60;
+    const tx = Math.cos(angle) * dist + (Math.random() - 0.5) * 30;
+    const ty = Math.sin(angle) * dist - 20;
+    const rot = (Math.random() - 0.5) * 60; // random rotation
+
+    bat.style.setProperty('--tx', tx + 'px');
+    bat.style.setProperty('--ty', ty + 'px');
+    bat.style.setProperty('--rot', rot + 'deg');
+    bat.style.left = (cx - 9) + 'px';
+    bat.style.top = (cy - 9) + 'px';
+    bat.style.animationDelay = (i * 0.06) + 's';
+    overlay.appendChild(bat);
+  }
+}
+
+function playWaterAnimation(overlay, cx, cy) {
+  const waterColors = ['#38BDF8', '#0EA5E9', '#7DD3FC', '#BAE6FD', '#0284C7', '#67E8F9'];
+  const dropCount = 20;
+
+  for (let i = 0; i < dropCount; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'water-particle';
+
+    // Fountain: narrow spread upward, then fall
+    const spread = (Math.random() - 0.5) * 60;
+    const height = -(50 + Math.random() * 50); // upward
+    const tx = spread;
+    const ty = height;
+
+    drop.style.setProperty('--tx', tx + 'px');
+    drop.style.setProperty('--ty', ty + 'px');
+    drop.style.left = (cx - 4) + 'px';
+    drop.style.top = (cy - 6) + 'px';
+    const color = waterColors[i % waterColors.length];
+    drop.style.background = color;
+    drop.style.boxShadow = `0 0 6px ${color}`;
+    drop.style.animationDelay = (i * 0.04) + 's';
+    overlay.appendChild(drop);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
