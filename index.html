@@ -811,6 +811,23 @@ function isbn13to10(isbn13) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   CASCADING COVER IMAGE FALLBACK
+   ═══════════════════════════════════════════════════════════ */
+function tryNextCover(img) {
+  let fallbacks;
+  try { fallbacks = JSON.parse(img.getAttribute('data-fallbacks') || '[]'); } catch { fallbacks = []; }
+  if (fallbacks.length > 0) {
+    const next = fallbacks.shift();
+    img.setAttribute('data-fallbacks', JSON.stringify(fallbacks));
+    img.src = next;
+  } else {
+    // All sources failed — show emoji
+    const emoji = img.getAttribute('data-emoji') || '📖';
+    img.parentElement.innerHTML = '<span class="book-emoji">' + emoji + '</span>';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    DATA
    ═══════════════════════════════════════════════════════════ */
 const SERIES = {
@@ -1120,15 +1137,22 @@ function renderBookCard(book) {
   else if (book.series === 'mirabelle') shortTitle = shortTitle.replace('Mirabelle ', '');
   else if (book.series === 'emerald') shortTitle = shortTitle.replace('Emerald ', '');
 
-  // Cover image: try coverId first, then Google Books, then Amazon CDN (by ISBN-10), then emoji fallback
-  let coverUrl = null;
-  if (book.coverId) coverUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`;
-  else if (book.googleCover) coverUrl = book.googleCover;
-  else if (book.isbn) coverUrl = `https://m.media-amazon.com/images/P/${isbn13to10(book.isbn)}.01._SCLZZZZZZZ_SX500_.jpg`;
+  // Build ordered list of cover URLs to try (cascading fallback)
+  const coverSources = [];
+  if (book.coverId) coverSources.push(`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`);
+  if (book.googleCover) coverSources.push(book.googleCover);
+  if (book.isbn) {
+    coverSources.push(`https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`);
+    coverSources.push(`https://m.media-amazon.com/images/P/${isbn13to10(book.isbn)}.01._SCLZZZZZZZ_SX500_.jpg`);
+  }
 
-  const coverHtml = coverUrl
-    ? `<div class="book-cover-wrap"><img class="book-cover" src="${coverUrl}" alt="${book.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'book-emoji\\'>${book.emoji}</span>'"></div>`
-    : `<span class="book-emoji">${book.emoji}</span>`;
+  let coverHtml;
+  if (coverSources.length > 0) {
+    const fallbacksJson = JSON.stringify(coverSources.slice(1));
+    coverHtml = `<div class="book-cover-wrap"><img class="book-cover" src="${coverSources[0]}" alt="${book.name}" loading="lazy" data-fallbacks='${fallbacksJson}' data-emoji="${book.emoji}" onerror="tryNextCover(this)"></div>`;
+  } else {
+    coverHtml = `<span class="book-emoji">${book.emoji}</span>`;
+  }
 
   return `
     <div class="${classes}" data-book="${book.name.replace(/"/g, '&quot;')}">
