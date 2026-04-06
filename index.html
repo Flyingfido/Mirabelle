@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="My Books">
 <meta name="theme-color" content="#9B8FE8">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="home-icon.png">
 <title>Harriet Muncaster Book Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,8 +79,19 @@ body::before {
 /* ═══════════════════════════════════════════════════════════
    SCREENS
    ═══════════════════════════════════════════════════════════ */
-.screen { display: none; position: relative; z-index: 1; }
-.screen.active { display: block; }
+.screen {
+  position: relative; z-index: 1;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+  max-height: 0; overflow: hidden;
+}
+.screen.active {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0s;
+  max-height: none; overflow: visible;
+}
 
 /* ═══════════════════════════════════════════════════════════
    HEADER
@@ -685,6 +697,100 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SERIES COMPLETION CELEBRATION
+   ═══════════════════════════════════════════════════════════ */
+.celebration-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.celebration-overlay.show { opacity: 1; pointer-events: auto; }
+.celebration-content {
+  text-align: center; color: #fff;
+  transform: scale(0.5); opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+}
+.celebration-overlay.show .celebration-content {
+  transform: scale(1); opacity: 1;
+}
+.celebration-emoji { font-size: 80px; margin-bottom: 12px; }
+.celebration-title {
+  font-family: 'Fredoka', sans-serif; font-size: 32px; font-weight: 700;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  margin-bottom: 8px;
+}
+.celebration-sub {
+  font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 600;
+  opacity: 0.9; margin-bottom: 24px;
+}
+.celebration-dismiss {
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5);
+  color: #fff; border-radius: 24px; padding: 10px 28px;
+  font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MILESTONE TOAST
+   ═══════════════════════════════════════════════════════════ */
+.milestone-toast {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  z-index: 10001;
+  background: linear-gradient(135deg, var(--primary), #C77DFF);
+  color: #fff; border-radius: 20px;
+  padding: 24px 36px; text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  opacity: 0; pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+.milestone-toast.show {
+  transform: translate(-50%, -50%) scale(1); opacity: 1;
+}
+.milestone-emoji { font-size: 48px; margin-bottom: 8px; }
+.milestone-text {
+  font-family: 'Fredoka', sans-serif; font-size: 22px; font-weight: 700;
+}
+.milestone-sub {
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+  opacity: 0.85; margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS / DATA MANAGEMENT
+   ═══════════════════════════════════════════════════════════ */
+.settings-toggle {
+  display: block; margin: 0 auto 8px;
+  background: none; border: 2px dashed var(--primary-light);
+  color: var(--text-light); border-radius: 12px;
+  padding: 10px 20px; font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.settings-panel {
+  display: none; max-width: 340px; margin: 0 auto 16px;
+  background: var(--card-bg); border-radius: var(--radius);
+  padding: 20px; box-shadow: 0 2px 8px var(--card-shadow);
+}
+.settings-panel.open { display: block; }
+.settings-btn-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.settings-btn {
+  flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+.settings-btn.export { background: var(--primary); color: #fff; }
+.settings-btn.import { background: var(--primary-light); color: var(--primary-dark); }
+.settings-status {
+  font-size: 13px; text-align: center; color: var(--owned);
+  font-weight: 700; min-height: 20px;
+}
+.import-file-input { display: none; }
+
+/* ═══════════════════════════════════════════════════════════
    EMPTY STATE
    ═══════════════════════════════════════════════════════════ */
 .empty-state {
@@ -730,6 +836,23 @@ body::before {
      ═══════════════════════════════════════════════════════════ -->
 <div class="wand-overlay" id="wandOverlay"></div>
 
+<!-- CELEBRATION OVERLAY -->
+<div class="celebration-overlay" id="celebrationOverlay">
+  <div class="celebration-content">
+    <div class="celebration-emoji" id="celebrationEmoji"></div>
+    <div class="celebration-title" id="celebrationTitle"></div>
+    <div class="celebration-sub" id="celebrationSub"></div>
+    <button class="celebration-dismiss" onclick="dismissCelebration()">Yay!</button>
+  </div>
+</div>
+
+<!-- MILESTONE TOAST -->
+<div class="milestone-toast" id="milestoneToast">
+  <div class="milestone-emoji" id="milestoneEmoji"></div>
+  <div class="milestone-text" id="milestoneText"></div>
+  <div class="milestone-sub" id="milestoneSub"></div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════
      SCREEN 1: HOME
      ═══════════════════════════════════════════════════════════ -->
@@ -742,6 +865,16 @@ body::before {
   <div class="stats-bar" id="homeStats"></div>
 
   <div class="character-grid" id="characterGrid"></div>
+
+  <button class="settings-toggle" onclick="toggleSettings()">⚙️ Settings</button>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-btn-row">
+      <button class="settings-btn export" onclick="exportData()">📥 Backup</button>
+      <button class="settings-btn import" onclick="document.getElementById('importFile').click()">📤 Restore</button>
+    </div>
+    <input type="file" id="importFile" class="import-file-input" accept=".json" onchange="importData(event)">
+    <div class="settings-status" id="settingsStatus"></div>
+  </div>
 
   <div class="footer">Made with magic for book lovers ✨</div>
 </div>
@@ -946,9 +1079,15 @@ function toggleOwned(bookName, cardEl) {
     // Trigger magic wand animation — look up series from book data
     const book = BOOKS.find(b => b.name === bookName);
     playWandAnimation(cardEl, book ? book.series : null);
+    playSparkleChime();
+    hapticBuzz();
   }
   state[bookName] = bs;
   saveState(state);
+  if (bs.owned) {
+    checkSeriesCompletion(bookName);
+    setTimeout(() => checkMilestones(), 600);
+  }
 }
 
 function toggleWish(bookName) {
@@ -1081,6 +1220,187 @@ function playWaterAnimation(overlay, cx, cy) {
     drop.style.animationDelay = (i * 0.04) + 's';
     overlay.appendChild(drop);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HAPTIC & AUDIO FEEDBACK
+   ═══════════════════════════════════════════════════════════ */
+let audioCtx = null;
+
+function playSparkleChime() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    [880, 1318.5, 1760].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, now + i * 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.06);
+      osc.stop(now + i * 0.06 + 0.35);
+    });
+  } catch (e) { /* audio not available */ }
+}
+
+function hapticBuzz() {
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SERIES COMPLETION CELEBRATIONS
+   ═══════════════════════════════════════════════════════════ */
+const CELEBRATIONS_KEY = 'hm_celebrations_v1';
+
+function loadCelebrations() {
+  try { return JSON.parse(localStorage.getItem(CELEBRATIONS_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveCelebration(seriesId) {
+  const c = loadCelebrations();
+  if (!c.includes(seriesId)) { c.push(seriesId); localStorage.setItem(CELEBRATIONS_KEY, JSON.stringify(c)); }
+}
+
+function checkSeriesCompletion(bookName) {
+  const book = BOOKS.find(b => b.name === bookName);
+  if (!book) return;
+  const seriesId = book.series;
+  if (loadCelebrations().includes(seriesId)) return;
+  const seriesBooks = BOOKS.filter(b => b.series === seriesId && !b.isNew);
+  const allOwned = seriesBooks.every(b => getBookState(b.name).owned);
+  if (allOwned) {
+    saveCelebration(seriesId);
+    setTimeout(() => showSeriesCelebration(seriesId), 800);
+  }
+}
+
+function showSeriesCelebration(seriesId) {
+  const s = SERIES[seriesId];
+  const overlay = document.getElementById('celebrationOverlay');
+  document.getElementById('celebrationEmoji').textContent = s.icon;
+  document.getElementById('celebrationTitle').textContent = `You completed ${s.name}!`;
+  document.getElementById('celebrationSub').textContent = 'Every single book — amazing!';
+  overlay.classList.add('show');
+
+  // Fire big particles on the wand overlay (screen center)
+  const wandOv = document.getElementById('wandOverlay');
+  const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+  const particleFn = seriesId === 'isadora' ? playBatAnimation
+    : seriesId === 'emerald' ? playWaterAnimation : playRainbowAnimation;
+  particleFn(wandOv, cx, cy);
+  setTimeout(() => { wandOv.innerHTML = ''; particleFn(wandOv, cx, cy); }, 400);
+  setTimeout(() => { wandOv.innerHTML = ''; particleFn(wandOv, cx, cy); }, 800);
+  setTimeout(() => { wandOv.innerHTML = ''; }, 2000);
+
+  // Auto-dismiss after 5s
+  setTimeout(dismissCelebration, 5000);
+}
+
+function dismissCelebration() {
+  document.getElementById('celebrationOverlay').classList.remove('show');
+  document.getElementById('wandOverlay').innerHTML = '';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MILESTONE POP-UPS
+   ═══════════════════════════════════════════════════════════ */
+const MILESTONES_KEY = 'hm_milestones_v1';
+const MILESTONE_THRESHOLDS = [5, 10, 15, 20, 25, 30, 35, 40, 45];
+const MILESTONE_MESSAGES = {
+  5:  { emoji: '⭐', text: '5 books!', sub: "You're a star reader!" },
+  10: { emoji: '🌟', text: '10 books!', sub: 'Double digits — wow!' },
+  15: { emoji: '📚', text: '15 books!', sub: 'A proper bookshelf!' },
+  20: { emoji: '🏆', text: '20 books!', sub: 'What a collection!' },
+  25: { emoji: '✨', text: '25 books!', sub: 'More than half way!' },
+  30: { emoji: '🎉', text: '30 books!', sub: 'Incredible collector!' },
+  35: { emoji: '🦇', text: '35 books!', sub: 'Almost there!' },
+  40: { emoji: '🧜', text: '40 books!', sub: 'So close to them all!' },
+  45: { emoji: '👑', text: 'ALL 45 books!', sub: 'The ultimate collector!' }
+};
+
+function loadMilestones() {
+  try { return JSON.parse(localStorage.getItem(MILESTONES_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function checkMilestones() {
+  const shown = loadMilestones();
+  const total = BOOKS.reduce((n, b) => n + (getBookState(b.name).owned ? 1 : 0), 0);
+  for (const threshold of MILESTONE_THRESHOLDS) {
+    if (total >= threshold && !shown.includes(threshold)) {
+      shown.push(threshold);
+      localStorage.setItem(MILESTONES_KEY, JSON.stringify(shown));
+      showMilestoneToast(threshold);
+      return;
+    }
+  }
+}
+
+function showMilestoneToast(n) {
+  const m = MILESTONE_MESSAGES[n];
+  const toast = document.getElementById('milestoneToast');
+  document.getElementById('milestoneEmoji').textContent = m.emoji;
+  document.getElementById('milestoneText').textContent = m.text;
+  document.getElementById('milestoneSub').textContent = m.sub;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EXPORT / IMPORT
+   ═══════════════════════════════════════════════════════════ */
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('open');
+}
+
+function exportData() {
+  const payload = {
+    version: 1,
+    exported: new Date().toISOString(),
+    collection: state,
+    celebrations: loadCelebrations(),
+    milestones: loadMilestones()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my-books-backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showSettingsStatus('Backup saved!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.collection || typeof data.collection !== 'object') throw new Error('Invalid');
+      state = data.collection;
+      saveState(state);
+      if (Array.isArray(data.celebrations)) localStorage.setItem(CELEBRATIONS_KEY, JSON.stringify(data.celebrations));
+      if (Array.isArray(data.milestones)) localStorage.setItem(MILESTONES_KEY, JSON.stringify(data.milestones));
+      refreshCurrentScreen();
+      showSettingsStatus('Collection restored!');
+    } catch {
+      showSettingsStatus('Could not read file');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function showSettingsStatus(msg) {
+  const el = document.getElementById('settingsStatus');
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ''; }, 4000);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1456,8 +1776,11 @@ function attachCardListeners(container) {
    NAVIGATION
    ═══════════════════════════════════════════════════════════ */
 function switchScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+  const target = document.getElementById(screenId);
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s !== target) s.classList.remove('active');
+  });
+  target.classList.add('active');
   window.scrollTo(0, 0);
 }
 
@@ -1477,6 +1800,10 @@ function refreshCurrentScreen() {
    INIT
    ═══════════════════════════════════════════════════════════ */
 renderHome();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,16 @@
+{
+  "name": "My Harriet Muncaster Books",
+  "short_name": "My Books",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5F0FF",
+  "theme_color": "#9B8FE8",
+  "icons": [
+    {
+      "src": "home-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
